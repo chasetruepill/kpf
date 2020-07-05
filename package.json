@@ -1,0 +1,21 @@
+{
+  "name": "kpf",
+  "version": "0.0.1",
+  "description": "Kube Port Forwarding Utility",
+  "scripts": {
+    "pkg": "tsc && pkg . --out-path bin",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": "build/kpf.js",
+  "author": "Chase Martin",
+  "license": "ISC",
+  "devDependencies": {
+    "@kubernetes/client-node": "^0.12.0",
+    "@types/command-line-args": "^5.0.0",
+    "@types/node": "^14.0.14",
+    "command-line-args": "^5.1.1",
+    "isomorphic-ws": "^4.0.1",
+    "pkg": "^4.4.9",
+    "typescript": "^3.9.6"
+  }
+}
