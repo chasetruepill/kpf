@@ -44,6 +44,8 @@ function print(obj) {
   console.log(util.inspect(obj, { colors: true, maxArrayLength: 10000, depth: 50 }))
 }
 
+// The Websocket and patchForward patches are basically from here: https://github.com/pixel-point/kube-forwarder/blob/master/src/renderer/store/modules/Connections.js
+
 // @ts-ignore
 WebSocketHandler.restartableHandleStandardInput = async function (createWS, stdin, streamNum = 0) {
   const tryLimit = 3;
