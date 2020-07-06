@@ -1,6 +1,6 @@
 {
   "name": "kpf",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Kube Port Forwarding Utility",
   "scripts": {
     "pkg": "tsc && pkg . --out-path bin",

@@ -5,6 +5,7 @@ import * as net from 'net'
 import { PortForward, KubeConfig, CoreV1Api } from '@kubernetes/client-node'
 import commandArgs from 'command-line-args'
 import * as util from 'util'
+import * as child_process from 'child_process'
 
 const pkgJson = require('../package.json')
  
@@ -37,7 +38,8 @@ const args = commandArgs([
   { name: 'namespace', type: String, alias: 'n', defaultValue: 'development' },
   { name: 'context', type: String, alias: 'c', defaultValue: null },
   { name: 'version', type: Boolean, alias: 'v', defaultValue: false },
-  { name: 'help', type: Boolean, alias: 'h', defaultValue: false }
+  { name: 'help', type: Boolean, alias: 'h', defaultValue: false },
+  { name: 'kill', type: Boolean, alias: 'k', defaultValue: false }
 ])
 
 function print(obj) {
@@ -159,6 +161,7 @@ export async function portForward({
   context = null,
   version = false,
   help = false,
+  kill = false,
 }: {
   endpoint: string
   namespace: string
@@ -167,6 +170,7 @@ export async function portForward({
   context?: string
   version?: boolean
   help?: boolean
+  kill?: boolean
 }) {
   if (version) {
     console.log(pkgJson.version)
@@ -194,6 +198,7 @@ Switches
 -n (--namespace)    |  Sets the namespace (default: development)
 -p (--port)         |  Sets the remote port to connect to (default: first exposed service or pod port)
 -l (--localPort)    |  Sets the local bind port (default: remote port)
+-k (--kill)         |  Check if Port Being Listened On Already, if not kill it. (OSX ONLY CURRENTLY)
 
 -v (--version)      |   Print the Version String
 -h (--help)         |   Print This Output
@@ -276,6 +281,26 @@ Switches
   })
 
   const listenPort = localPort || port
+
+  function getRunning() {
+    try {
+      return child_process.execSync(`lsof -nP -iTCP:${listenPort} | grep LISTEN`).toString('utf-8')
+    } catch (_) {
+      return null
+    }
+  }
+
+  const runningPorts = getRunning()
+
+  if (runningPorts) {
+    if (!kill) throw new Error('Port being listened on already, and no kill switch engaged.')
+  
+    const [_, pid] = runningPorts.split(' ').filter(s => !!s)  
+    console.log('killing pid: ', pid)
+
+    child_process.execSync(`kill -9 ${pid}`)
+    while (getRunning()) {}
+  }
 
   server.listen(listenPort, 'localhost', () => {
     console.log(`listening on localhost:${listenPort}`)
