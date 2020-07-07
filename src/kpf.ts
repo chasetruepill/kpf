@@ -91,6 +91,8 @@ WebSocketHandler.restartableHandleStandardInput = async function (createWS, stdi
     queue = queue.then(processData(data))
   })
 
+  stdin.on('error', console.error)
+
   stdin.on('end', () => {
     if (ws) {
       ws.close();
